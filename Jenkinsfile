@@ -5,35 +5,35 @@ pipeline {
         DIRECTORY_PATH = 'src'
         TESTING_ENVIRONMENT = 'Staging'
         PRODUCTION_ENVIRONMENT = 'PauProduction'
-        EMAIL_RECIPIENT = 'your-email@example.com'
+        EMAIL_RECIPIENT = 'pautangpua2020@gmail.com'
     }
 
     stages {
         stage('Build') {
             steps {
                 echo "Building the code using Maven"
-                // Add Maven build command, e.g., sh 'mvn clean install'
+                sh 'mvn clean install'
             }
         }
 
         stage('Unit and Integration Tests') {
             steps {
                 echo "Running unit tests with JUnit and integration tests"
-                // Add test commands, e.g., sh 'mvn test'
+                sh 'mvn test'
             }
         }
 
         stage('Code Analysis') {
             steps {
                 echo "Performing code analysis using SonarQube"
-                // Add code analysis command, e.g., sh 'sonar-scanner'
+                sh 'sonar-scanner'
             }
         }
 
         stage('Security Scan') {
             steps {
                 echo "Performing security scan using OWASP ZAP"
-                // Add security scan command, e.g., sh 'zap-cli scan http://localhost:8080'
+                sh 'zap-cli quick-scan http://your-app-url'
             }
             post {
                 always {
@@ -50,21 +50,21 @@ pipeline {
         stage('Deploy to Staging') {
             steps {
                 echo "Deploying to the staging environment on AWS EC2"
-                // Add deployment command, e.g., sh 'scp target/app.war ec2-user@staging-server:/path/to/deploy'
+                sh 'scp target/app.war ec2-user@staging-server:/path/to/deploy'
             }
         }
 
         stage('Integration Tests on Staging') {
             steps {
                 echo "Running integration tests on the staging environment"
-                // Add integration test command on staging
+                sh './run-staging-tests.sh'
             }
         }
 
         stage('Deploy to Production') {
             steps {
                 echo "Deploying to production environment: ${PRODUCTION_ENVIRONMENT}"
-                // Add deployment command for production, e.g., sh 'scp target/app.war ec2-user@prod-server:/path/to/deploy'
+                sh 'scp target/app.war ec2-user@prod-server:/path/to/deploy'
             }
         }
     }
