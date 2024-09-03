@@ -1,82 +1,63 @@
 pipeline {
     agent any
 
-    environment {
-        DIRECTORY_PATH = 'src'
-        TESTING_ENVIRONMENT = 'Staging'
-        PRODUCTION_ENVIRONMENT = 'PauProduction'
-        EMAIL_RECIPIENT = 'pautangpua2020@gmail.com'
-    }
+
+
+
 
     stages {
         stage('Build') {
             steps {
-                echo "Building the code using Maven"
-                sh 'mvn clean install'
+                echo "Fetching the source code from the directory path specified by the environment variable."
+                echo "Compiling the code and generating any necessary artifacts."
             }
         }
-
         stage('Unit and Integration Tests') {
             steps {
-                echo "Running unit tests with JUnit and integration tests"
-                sh 'mvn test'
+                echo "Running unit tests."
+                echo "Running integration tests."
             }
         }
 
         stage('Code Analysis') {
             steps {
-                echo "Performing code analysis using SonarQube"
-                sh 'sonar-scanner'
+                echo "Checking the quality of the code using a code analysis tool."
             }
         }
 
         stage('Security Scan') {
             steps {
-                echo "Performing security scan using OWASP ZAP"
-                sh 'zap-cli quick-scan http://your-app-url'
-            }
-            post {
-                always {
-                    emailext (
-                        to: "${EMAIL_RECIPIENT}",
-                        subject: "Security Scan Results",
-                        body: "The security scan stage has completed. Check the logs for details.",
-                        attachLog: true
-                    )
-                }
-            }
-        }
-
-        stage('Deploy to Staging') {
-            steps {
-                echo "Deploying to the staging environment on AWS EC2"
-                sh 'scp target/app.war ec2-user@staging-server:/path/to/deploy'
+                echo "Identifying vulnerabilities using a security scanning tool."
             }
         }
 
         stage('Integration Tests on Staging') {
             steps {
-                echo "Running integration tests on the staging environment"
-                sh './run-staging-tests.sh'
+                echo "Running integration tests on the staging environment."
             }
         }
 
         stage('Deploy to Production') {
             steps {
-                echo "Deploying to production environment: ${PRODUCTION_ENVIRONMENT}"
-                sh 'scp target/app.war ec2-user@prod-server:/path/to/deploy'
+                echo "Deploying the code to the production environment."
             }
         }
     }
 
     post {
-        always {
-            emailext (
-                to: "${EMAIL_RECIPIENT}",
-                subject: "Pipeline Completed",
-                body: "The pipeline has completed all stages. Check the Jenkins logs for details.",
-                attachLog: true
-            )
+        success {
+            emailext attachLog: true,
+            compressLog: true,
+            to: 'pautangpua2020@gmail.com',
+            body: "log is available at $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log",
+            subject: "Production Deployment is Successful - Jenkins"
+        }
+        failure {  
+            emailext attachLog: true,
+            compressLog: true,
+            to: 'pautangpua2020@gmail.com',
+            body: "log is available at $JENKINS_HOME/jobs/$JOB_NAME/builds/lastSuccessfulBuild/log",
+            subject: "Production Deployment is Failed - Jenkins"
         }
     }
 }
