@@ -55,33 +55,24 @@ pipeline {
         }
     }
 
-    post {
+        post {
         success {
             emailext(
+                attachLog: true,
+                compressLog: true,
                 to: 'paustriker2018@gmail.com',
-                subject: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                <p>Good news!</p>
-                <p>The build was successful.</p>
-                <p>Project: ${env.JOB_NAME}</p>
-                <p>Build Number: ${env.BUILD_NUMBER}</p>
-                <p>View details at: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                """,
-                attachLog: true
+                body: "The build was successful. Logs are attached.",
+                subject: "Build Success - Jenkins"
             )
         }
         failure {
             emailext(
+                attachLog: true,
+                compressLog: true,
                 to: 'paustriker2018@gmail.com',
-                subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                <p>Unfortunately, the build failed.</p>
-                <p>Project: ${env.JOB_NAME}</p>
-                <p>Build Number: ${env.BUILD_NUMBER}</p>
-                <p>View details at: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                """,
-                attachLog: true
+                body: "The build failed. Logs are attached.",
+                subject: "Build Failure - Jenkins"
             )
         }
-    }
+    }  
 }
